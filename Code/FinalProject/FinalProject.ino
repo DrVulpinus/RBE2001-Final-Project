@@ -14,10 +14,18 @@ void setup() {
   Serial.begin(9600);
   setupMotors(); //Attach the motors to the correct ports
   setupLCD(); //Setup and begin the LCD output
-
+  lcdPrintLn("Im Here");
 }
-
+boolean foundI = false;
 void loop() {
-  followLine(30, .05); //(Start Power = 10, pScale = 10)
   
+ 
+  if (!foundI){
+    followLine(20, .07); //(Start Power = 10, pScale = 10)
+    foundI = checkForIntersection(650);
+  }
+  else{
+   stopMotors(); 
+  }
+  lcdPrintLn(analogRead(lightRR));
 }
