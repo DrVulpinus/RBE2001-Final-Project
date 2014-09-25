@@ -12,7 +12,8 @@ const int lightRR = 3; //Rear Right Light Sensor
 
 void setup() {
   Serial.begin(9600);
-  setupMotors();//Attach the motors to the correct ports
+  setupMotors(); //Attach the motors to the correct ports
+  setupLCD(); //Setup and begin the LCD output
 
 }
 
