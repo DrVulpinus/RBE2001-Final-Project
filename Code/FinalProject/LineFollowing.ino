@@ -15,10 +15,10 @@ void followLine(int startPower, float pScale){
   runMotors(startPower - lightDiff, startPower + lightDiff);
 }
 
-boolean checkForInterSection(int threshold){
+boolean checkForIntersection(int threshold){
   int rr = analogRead(lightRR);//Read the value of the right read sensor
   int rl = analogRead(lightRL); //Read the value of the left rear sensor  
-  if (rr < threshold && rl < threshold){// check to see that the values of each sensor are below the threshold
+  if (rr > threshold && rl > threshold){// check to see that the values of each sensor are below the threshold
    return true; 
   }
   else{
