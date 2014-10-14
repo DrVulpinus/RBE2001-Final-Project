@@ -10,7 +10,7 @@ void configureSensors(){
   //pScale is the proportional value by which the value of the difference between the right and left sensor is scaled.
 void followLine(int startPower, float pScale){
   float lightDiff = analogRead(lightFL) - analogRead(lightFR);
-  Serial.println(lightDiff);
+  lightDiff = sqrt(lightDiff);
   lightDiff = lightDiff * pScale;
   runMotors(startPower - lightDiff, startPower + lightDiff);
 }
@@ -25,3 +25,25 @@ boolean checkForIntersection(int threshold){
     return false;
   }
 }
+
+void turnRight90(){
+  Serial.print(" Turn Right ");
+  float lightDiff = 0;
+  while(lightDiff < 50){
+    lightDiff = analogRead(lightFR) - analogRead(lightFL);
+    runMotors(30,-30);
+  }
+  stopMotors();
+}
+
+void turnLeft90(){
+  Serial.print(" Turn Left ");
+  float lightDiff = 0;
+  while(lightDiff < 50){
+    lightDiff = analogRead(lightFL) - analogRead(lightFR);
+    runMotors(-30,30);
+  }
+  stopMotors();
+}
+
+

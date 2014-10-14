@@ -3,7 +3,7 @@
 
 
 
-LiquidCrystal lcd(37, 35, 29, 27, 25, 23); //Initialize the LCD library on the correct pins
+LiquidCrystal lcd(37, 35, 29, 27, 25, 21); //Initialize the LCD library on the correct pins
 
 String firstLine = "";
 String secondLine = "";
