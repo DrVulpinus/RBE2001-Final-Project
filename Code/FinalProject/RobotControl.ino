@@ -12,8 +12,11 @@ byte prevMoveStatus = 0x01;
 void stopRobot(){
   prevMoveStatus = robotStatusData[0]; //Get the current robot movement state (this will be used when the stop flag is cleared)
   robotStatusData[0] = 0x01; //Set the robot status flag to stopped
+  armWristRaise();
+  delay(500);
+  armClawOpen();
   stopMotors(); //Stop driving
- 
+
 }
 
 
@@ -34,12 +37,25 @@ boolean bumperHit(){
 }
 
 boolean goToReactorA(){
- return goToPosition(0); 
+    Serial.print(" Going to reactor A ");
+  if(!goToCenterLine()){
+    return false; 
+  }
+  else{
+    turnToReactorA();
+    return followToEnd(0); 
+  }
 }
 
 boolean goToReactorB(){
   Serial.print(" Going to reactor B ");
- return goToPosition(5); 
+  if(!goToCenterLine()){
+    return false; 
+  }
+  else{
+    turnToReactorB();
+    return followToEnd(5); 
+  }
 }
 
 boolean goToSupplyTube(int tube){
@@ -79,18 +95,20 @@ boolean goToPosition(int destination){
       }
       else{//We must be below our final destination, so we need to point towards Reactor B
         turnToReactorB();
+
         if (!checkForIntersection(200)){
           followLine(30, .7);
           return false;
         }
         else{
-           while(checkForIntersection(200)){
+          while(checkForIntersection(200)){
             runMotors(30,30);
           }
           stopMotors();
           positionNumber ++;
           return false;
-        }        
+        }     
+
       }//End the "we are below the final destination else"
     }//End the "we are on the centerline else"
   }//End the "are we there yet" if
@@ -125,7 +143,7 @@ boolean goToPosition(int destination){
     Serial.println("----------------------------------------------------------WE MADE IT------------------------------------------------------------------------------------");
     Serial.println("----------------------------------------------------------WE MADE IT------------------------------------------------------------------------------------");
     Serial.println("----------------------------------------------------------WE MADE IT------------------------------------------------------------------------------------");
-    
+
     return true;
   }
 }
@@ -148,7 +166,7 @@ boolean goToCenterLine(){
   }
   //We now know where we are, and we know we are pointing towards the center line, the only thing left to do is to drive to the next intersection
   if (!checkForIntersection(150)){
-    followLine(20, .7);
+    followLine(30, .7);
     return false;
   }
   else{
@@ -162,7 +180,18 @@ boolean goToCenterLine(){
 
 
 
+boolean followToEnd(int endPos){
+  if (digitalRead(swFrontBumper)){
+    followLine(30, .7);
+    return false;
+  }
+  else{
+    stopMotors();
+    positionNumber = endPos;
+    return true;
+  }
 
+}
 
 
 
@@ -171,7 +200,7 @@ boolean goToCenterLine(){
 void turnToStorageTubes(){
   switch(directionNumber){
   case dirReactorA:
-     turnRight90();
+    turnRight90();
 
     break;
   case dirReactorB:
@@ -187,9 +216,9 @@ void turnToStorageTubes(){
     break;
   default:
     break;  
-   
+
   } 
-   directionNumber = dirStorageTubes; //Set the new direction of the robot
+  directionNumber = dirStorageTubes; //Set the new direction of the robot
 }
 void turnToSupplyTubes(){
   switch(directionNumber){
@@ -198,7 +227,7 @@ void turnToSupplyTubes(){
 
     break;
   case dirReactorB:
-   turnRight90();
+    turnRight90();
 
     break;
   case dirStorageTubes:
@@ -210,7 +239,7 @@ void turnToSupplyTubes(){
     break;
   default:
     break;  
-    
+
   } 
   directionNumber = dirSupplyTubes; //Set the new direction of the robot
 }
@@ -233,19 +262,19 @@ void turnToReactorA(){
     break;
   default:
     break;  
-   
+
   } 
-   directionNumber = dirReactorA; //Set the new direction of the robot
+  directionNumber = dirReactorA; //Set the new direction of the robot
 }
 
 
 
 void turnToReactorB(){
-  
+
   switch(directionNumber){
   case dirReactorA:
-  Serial.print("Turn to Reactor B: ");
-  Serial.println(directionNumber);
+    Serial.print("Turn to Reactor B: ");
+    Serial.println(directionNumber);
     turnRight90();
     turnRight90();
     break;
@@ -253,22 +282,48 @@ void turnToReactorB(){
 
     break;
   case dirStorageTubes:
-  Serial.print("Turn to Reactor B: ");
-  Serial.println(directionNumber);
+    Serial.print("Turn to Reactor B: ");
+    Serial.println(directionNumber);
     turnRight90();
     break;
   case dirSupplyTubes:
-  Serial.print("Turn to Reactor B: ");
-  Serial.println(directionNumber);
+    Serial.print("Turn to Reactor B: ");
+    Serial.println(directionNumber);
     turnLeft90();
     break;
   default:
     break;  
-    
+
   } 
   directionNumber = dirReactorB; //Set the new direction of the robot
 }
 
+void extractLow(){
+  armWristLower();
+  delay(750);
+  armClawOpen();
+  delay(750);
+  armMainLower();
+  setArmPositions();
+  delay(750);
+  armClawClose();
+  delay(750);
+  armMainRaise();
+  setArmPositions();
+  delay(750);
+}
+
+void depositLow(){
+  
+}
+
+void depositHigh(){
+  
+}
+
+void extractHigh(){
+  
+}
 
 
 

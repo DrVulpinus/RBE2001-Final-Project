@@ -112,72 +112,80 @@ void sendMsgRadUpdate(int radLevel){
 
 //This function sends a heartbeat message when it is called
 void sendMsgHB(){
-  //Serial.println("Sending HB");
-  byte pkt[10];                                // allocate memory for the bytes in the packet
-  int sz;                                      // holds the size of the message (in bytes)
-  byte type;                                   // hold the message type id
-  byte data1[3];                               // holds any data associated with a message
-  sendHB = false;                              // clear the heartbeat flag
 
-  // generate and send the heartbeat message    
-  digitalWrite(onboardLED, !digitalRead(onboardLED));  // flip the state of the HB LED
-  pcol.setDst(0x00);			                // this will be a broadcast message
-  sz = pcol.createPkt(msgTypeHeartbeat, data1, pkt);              // create a packet using the heartbeat type ID (there is no data)
-  btmaster.sendPkt(pkt, sz);                          // send to the field computer
+  if (go == true){
+    //Serial.println("Sending HB");
+    byte pkt[10];                                // allocate memory for the bytes in the packet
+    int sz;                                      // holds the size of the message (in bytes)
+    byte type;                                   // hold the message type id
+    byte data1[3];                               // holds any data associated with a message
+    sendHB = false;                              // clear the heartbeat flag
+
+    // generate and send the heartbeat message    
+    digitalWrite(onboardLED, !digitalRead(onboardLED));  // flip the state of the HB LED
+    pcol.setDst(0x00);			                // this will be a broadcast message
+    sz = pcol.createPkt(msgTypeHeartbeat, data1, pkt);              // create a packet using the heartbeat type ID (there is no data)
+    btmaster.sendPkt(pkt, sz);                          // send to the field computer
+  }
 }
-
 //This function sends a high radiation alert message
 void sendMsgRadHigh(){
-  byte pkt[10];                                // allocate memory for the bytes in the packet
-  int sz;                                      // holds the size of the message (in bytes)
-  byte type;                                   // hold the message type id
-  byte data1[3];                               // holds any data associated with a message
-  sendRadLevel = false;                              // clear the heartbeat flag
+  if (go == true){
+    byte pkt[10];                                // allocate memory for the bytes in the packet
+    int sz;                                      // holds the size of the message (in bytes)
+    byte type;                                   // hold the message type id
+    byte data1[3];                               // holds any data associated with a message
+    sendRadLevel = false;                              // clear the heartbeat flag
 
-  // generate and send the heartbeat message    
-  digitalWrite(onboardLED, !digitalRead(onboardLED));  // flip the state of the HB LED
-  pcol.setDst(0x00);			               // this will be a broadcast message
-  data1[0] = msgDataRadHigh;                                     // indicate a new fuel rod
-  sz = pcol.createPkt(msgTypeRadAlert, data1, pkt);               // create a packet using the heartbeat type ID (there is no data)
-  btmaster.sendPkt(pkt, sz);                           // send to the field computer
+    // generate and send the heartbeat message    
+    digitalWrite(onboardLED, !digitalRead(onboardLED));  // flip the state of the HB LED
+    pcol.setDst(0x00);			               // this will be a broadcast message
+    data1[0] = msgDataRadHigh;                                     // indicate a new fuel rod
+    sz = pcol.createPkt(msgTypeRadAlert, data1, pkt);               // create a packet using the heartbeat type ID (there is no data)
+    btmaster.sendPkt(pkt, sz);                           // send to the field computer
+  }
 }
-
 //This function sends a low radiation alert message
 void sendMsgRadLow(){
-  byte pkt[10];                                // allocate memory for the bytes in the packet
-  int sz;                                      // holds the size of the message (in bytes)
-  byte type;                                   // hold the message type id
-  byte data1[3];                               // holds any data associated with a message
-  sendRadLevel = false;                              // clear the heartbeat flag
-  pcol.setDst(0x00);			               // this will be a broadcast message
-  data1[0] = msgDataRadLow;                                     // indicate a new fuel rod
-  sz = pcol.createPkt(msgTypeRadAlert, data1, pkt);               // create a packet using the heartbeat type ID (there is no data)
-  btmaster.sendPkt(pkt, sz);                           // send to the field computer
+  if (go == true){
+    byte pkt[10];                                // allocate memory for the bytes in the packet
+    int sz;                                      // holds the size of the message (in bytes)
+    byte type;                                   // hold the message type id
+    byte data1[3];                               // holds any data associated with a message
+    sendRadLevel = false;                              // clear the heartbeat flag
+    pcol.setDst(0x00);			               // this will be a broadcast message
+    data1[0] = msgDataRadLow;                                     // indicate a new fuel rod
+    sz = pcol.createPkt(msgTypeRadAlert, data1, pkt);               // create a packet using the heartbeat type ID (there is no data)
+    btmaster.sendPkt(pkt, sz);                           // send to the field computer
+  }
 }
 
 //This function sends a low radiation alert message
 void sendMsgRobotStatus(){
-  byte pkt[10];                                // allocate memory for the bytes in the packet
-  int sz;                                      // holds the size of the message (in bytes)
-  byte type;                                   // hold the message type id
-  byte data1[3];                               // holds any data associated with a message
-  sendRbtStatus = false;
-  pcol.setDst(0x00);			               // this will be a broadcast message
-  data1[0] = robotStatusData[0];
-  data1[1] = robotStatusData[1];
-  data1[2] = robotStatusData[2];
-  sz = pcol.createPkt(msgTypeRbtStatus, data1, pkt);   // create a packet using the heartbeat type ID (there is no data)
-  btmaster.sendPkt(pkt, sz);                           // send to the field computer
+  if (go == true){
+    byte pkt[10];                                // allocate memory for the bytes in the packet
+    int sz;                                      // holds the size of the message (in bytes)
+    byte type;                                   // hold the message type id
+    byte data1[3];                               // holds any data associated with a message
+    sendRbtStatus = false;
+    pcol.setDst(0x00);			               // this will be a broadcast message
+    data1[0] = robotStatusData[0];
+    data1[1] = robotStatusData[1];
+    data1[2] = robotStatusData[2];
+    sz = pcol.createPkt(msgTypeRbtStatus, data1, pkt);   // create a packet using the heartbeat type ID (there is no data)
+    btmaster.sendPkt(pkt, sz);                           // send to the field computer
+  }
 }
 
 
 void getMessages(){  
+
   byte pkt[10];                                // allocate memory for the bytes in the packet
   int sz;                                      // holds the size of the message (in bytes)
   byte type;                                   // hold the message type id
   byte data1[3];                               // holds any data associated with a message
   if (btmaster.readPacket(pkt)) {              // if we have received a message
-  Serial.print(" Got Message ");
+    Serial.print(" Got Message ");
     if (pcol.getData(pkt, data1, type)) {      // see if we can extract the type and data
       switch (type) {                          // process the message based on the type
       case msgTypeStorAvail:                               // received a storage tube message
@@ -198,6 +206,7 @@ void getMessages(){
     }
   }
 }
+
 
 
 

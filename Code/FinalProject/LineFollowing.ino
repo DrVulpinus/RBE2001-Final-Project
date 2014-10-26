@@ -12,7 +12,9 @@ void followLine(int startPower, float pScale){
   float lightDiff = analogRead(lightFL) - analogRead(lightFR);
   lightDiff = sqrt(lightDiff);
   lightDiff = lightDiff * pScale;
-  runMotors(startPower - lightDiff, startPower + lightDiff);
+  int pwrL = constrain(startPower - lightDiff,-50,50);
+  int pwrR = constrain(startPower + lightDiff,-50,50);
+  runMotors(pwrL,pwrR);
 }
 
 boolean checkForIntersection(int threshold){
@@ -31,7 +33,11 @@ void turnRight90(){
   float lightDiff = 0;
   while(lightDiff < 50){
     lightDiff = analogRead(lightFR) - analogRead(lightFL);
-    runMotors(30,-30);
+    runMotors(20,-20);
+  }
+  while(lightDiff > 50){
+    lightDiff = analogRead(lightFR) - analogRead(lightFL);
+    runMotors(20,-20);
   }
   stopMotors();
 }
@@ -41,7 +47,11 @@ void turnLeft90(){
   float lightDiff = 0;
   while(lightDiff < 50){
     lightDiff = analogRead(lightFL) - analogRead(lightFR);
-    runMotors(-30,30);
+    runMotors(-20,20);
+  }
+  while(lightDiff > 50){
+    lightDiff = analogRead(lightFL) - analogRead(lightFR);
+    runMotors(-20,20);
   }
   stopMotors();
 }

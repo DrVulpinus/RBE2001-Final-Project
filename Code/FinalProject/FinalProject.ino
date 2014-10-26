@@ -37,24 +37,26 @@
 
 //This section contains all of the configurations for everything on the robot
 //This include the motor ports, sensor ports, and any other values which are set once at the beginning and not touched again
-#define rightDrivePort 12
+#define rightDrivePort 9
 #define leftDrivePort 13
-#define armMainPort 11
-#define armWristPort 10
-#define armClawPort 9
+#define armMainPort 7
+#define armWristPort 6
+#define armClawPort 8
 #define lightFL 0 //Front Left Light Sensor
 #define lightFR 1 //Front Right Light Sensor
 #define lightRL 2 //Rear Left Light Sensor
 #define lightRR 3 //Rear Right Light Sensor
 #define swArmMainUpr 23
 #define swArmMainLwr 22
-#define swFrontBumper 24
+#define swFrontBumper 32
 #define swEstop 25
+#define swMessageGo 3
 
 
 
-
-int armMainPos = 70;
+#define armMainDown 0
+#define armMainUp 1
+int armMainPos = armMainUp;
 
 // set up module-wide variables
 // these are 'volatile' as they are referenced in as well as outside of ISRs
@@ -77,7 +79,7 @@ byte storageData;                              // holds the bitmask for the stor
 byte supplyData;                               // ... and the supply tubes
 
 byte robotStatusDataOld[3];
-
+int gameState =0;
 
 //This variable stores the "X" position of the robot
 //0 = Reactor A
@@ -111,12 +113,13 @@ void setup() {
   setupMotors(); //Attach the motors to the correct ports
   //setupLCD();    //Setup and begin the LCD output
   setupTimer();  //Setup the timer code
-  setupPPM();
-  lcdPrintLn("Im Here");
+  //setupPPM();
+
   pinMode(swArmMainUpr, INPUT_PULLUP);
   pinMode(swArmMainLwr, INPUT_PULLUP);
   pinMode(swFrontBumper, INPUT_PULLUP);
   pinMode(swEstop, INPUT_PULLUP);
+  pinMode(swMessageGo, INPUT_PULLUP);
   delay(500);
 }
 boolean foundI = false;
@@ -132,54 +135,59 @@ void loop() {
    The only message type for which this does not apply is the robot status messages, these are only sent when the status changes,
    and if the staus changes, but there is some time before the status message gets sent, we shouldn't be as concerned as we would be with
    radiation alerts or heartbeats*/
+  if (!digitalRead(swMessageGo)){
+    go = true;
+  }
+
 
   if (sendHB){      //If the flag for a heartbeat has been set
     sendMsgHB();    //Send it right now
+    delay(20);
   }
 
   if (sendRadLevel){ //If the flag for sending a rad level has been set
     sendMsgRadUpdate(radLevelData);  //send it right now
+    delay(20);
   }
   if (sendRbtStatus){
     sendMsgRobotStatus();
+    delay(20);
   }
+
 
 
   //This switch runs the robot in each different mode, stopped, Teleop, and Autonomous
-  
-  
+
+
   if (digitalRead(swEstop)){
-     stopRobot();
-     Serial.print(" Estop Engaged ");
+    stopRobot();
+    Serial.print(" Estop Engaged ");
   }
   else{
     robotStatusData[0] = rbtStatMoveTeleop;
-    
+
   }
   switch(robotStatusData[0]){
   case rbtStatMoveStop:
     //We are stopped, don't do nothin'!
-    
+
     break;
   case rbtStatMoveTeleop:
+    setArmPositions();
     Serial.print(" Teleop Mode ");
+    printServoPositions();
     driveTeleop();
     break;
   case rbtStatMoveAuto:
-  Serial.print(" Auto Mode ");
-  
- // Serial.println(storageData);
-    //autonomousStuff();
-    
-    if (!gotToStep2){
-      gotToStep2 = goToReactorB();
-    }
-    else{
-      goToSupplyTube(2);
-    }
-    
-    
-    
+    setArmPositions();
+    Serial.print(" Auto Mode ");
+
+    // Serial.println(storageData);
+    autonomousStuff();
+
+
+
+
     break;
   default:
     //This should never happen, but if it does, we shouldn't do anything because it shouldn't happen, and therefore something must be borked
@@ -197,38 +205,40 @@ boolean isStoreTubeOpen(int tubeNum){
 boolean isSupplyTubeOpen(int tubeNum){
   return bitRead(supplyData, tubeNum);
 }
-/*
-void autonomousStuff(){
-  switch(autoState){
-  case gSFollowLineToReactor:
-    if(!bumperHit()){
-      followLine(20,7); 
-    }  
-    else{
-      autoState = gSRemoveTubeFromReactor;
-    }
-    break;
-  case gSRemoveTubeFromReactor:
-    //Open Claw
-    //Tilt Down
-    //Lower Arm
-    //Grip
-    radLevelData = 1; //Set the radiation level to the low level
-    //Raise Arm
-    autoState = gSTurnAround;
-    break;
-  case gSTurnAround:
-    //Turn Until we see the line again
-    autoState = gSFollowLineToIntersection;
-    break;
-  case gSFollowLineToIntersection:
 
+void autonomousStuff(){
+  switch(gameState){
+  case 0:
+    if (goToReactorA()){
+      gameState++;
+    }   
+    break;
+  case 1:
+    extractLow();
+    gameState++;
+    break;
+  case 2:
+    //if (gotToReactorB()){
+    //gameState++;
+    //}
+    break;
+  case 3:
+    stopMotors();
     break;
   default:
     break; 
   }
 }
-*/
+
+
+
+
+
+
+
+
+
+
 
 
 
